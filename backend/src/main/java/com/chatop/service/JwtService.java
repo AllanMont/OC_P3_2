@@ -38,6 +38,11 @@ public class JwtService {
         private Claims extractAllClaims(String token) {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         }
+
+        public Boolean isTokenValid(String token, UserDetails userDetails) {
+            final String username = extractUserEmail(token);
+            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        }
         
         public String generateToken(User user) {
           return Jwts.builder()
