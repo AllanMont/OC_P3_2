@@ -71,7 +71,20 @@ public class RentalController {
 	}
 	
 	@PutMapping("/{id}")
-	public void updateRentalById(Integer id) {
-		
+	public ResponseEntity<String> updateRental(@PathVariable Integer id, @ModelAttribute("rentals") RentalDto rentalsDto) {
+		Optional<Rental> optionalRental = rentalService.getOneRentalById(id);
+		if (optionalRental.isPresent()) {
+			Rental foundRental = optionalRental.get();
+			foundRental.setName(rentalsDto.getName());
+			foundRental.setPrice(rentalsDto.getPrice());
+			foundRental.setSurface(rentalsDto.getSurface());
+			foundRental.setDescription(rentalsDto.getDescription());
+			Rental updatedRental = rentalService.updateRental(foundRental);
+			if (updatedRental != null) {
+				return ResponseEntity.ok("Location mise à jour avec succès !");
+			}
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Échec de la mise à jour de la location.");
+		}
+		return ResponseEntity.notFound().build();
 	}
 }
