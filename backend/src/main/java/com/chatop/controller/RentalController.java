@@ -63,9 +63,7 @@ public class RentalController {
 		newRental.setDescription(rentalsDto.getDescription());
 		Rental createdRental = rentalService.createRental(newRental);
 
-	    if (createdRental != null) {
-	        return ResponseEntity.ok("Location créée avec succès !");
-	    }
+	    if (createdRental != null) return ResponseEntity.ok("Location créée avec succès !");
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Échec de la création de la location.");
 	    
 	}

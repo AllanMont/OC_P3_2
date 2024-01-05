@@ -16,6 +16,11 @@ public class MessageService {
 	  private MessageRepository messageRepository;
 
 	  public Message newMessages(Message message) {
-	    return messageRepository.save(message);
+		int newId = messageRepository.findAll().size() + 1;
+		message.setId(newId);
+		message.setCreated_at(java.time.LocalDateTime.now());
+		message.setUpdated_at(java.time.LocalDateTime.now());
+		Message savedMessage = messageRepository.save(message);
+		return savedMessage;
 	  }
 }

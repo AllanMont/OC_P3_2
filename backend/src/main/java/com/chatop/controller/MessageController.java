@@ -1,7 +1,5 @@
 package com.chatop.controller;
 
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +12,7 @@ import com.chatop.service.MessageService;
 
 @RestController
 @RequestMapping("/api/messages")
-public class MessageController {
+public class MessageController {	
 
 	private final MessageService messageService;
 	
@@ -23,12 +21,9 @@ public class MessageController {
     	}
   	
 	@PostMapping
-	  public ResponseEntity<Map<String, String>> newMessages(@RequestBody Message message) {
-	    Message messageSaved = messageService.newMessages(message);
-	    if (messageSaved != null) {
-	      return ResponseEntity.ok(Map.of("message", "Message send with success"));
-	    }
-	      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-	    
-	  }	
+	  public ResponseEntity<String> newMessages(@RequestBody Message message) {
+		Message newMessage = messageService.newMessages(message);
+		if(newMessage == null) { return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); }
+		return ResponseEntity.ok("Message envoyé");
+	}
 }
