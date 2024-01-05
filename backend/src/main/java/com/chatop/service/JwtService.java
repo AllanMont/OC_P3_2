@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +19,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class JwtService {
-    private String secretKey;
+    private final SecretKey secretKey;
+
+    @Autowired
+    public JwtService(SecretKey secretKey) {
+        this.secretKey = secretKey;
+    }
 
     public String extractUserEmail(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -26,6 +34,7 @@ public class JwtService {
             return extractClaim(token, Claims::getExpiration);
         }
 
+        
         public Boolean isTokenExpired(String token) {
             return extractExpiration(token).before(new Date());
         }
@@ -39,9 +48,16 @@ public class JwtService {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         }
 
-        public Boolean isTokenValid(String token, UserDetails userDetails) {
-            final String username = extractUserEmail(token);
-            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        public boolean isTokenValid(String token, UserDetails userDetails) {
+            try {
+                Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
         }
         
         public String generateToken(User user) {
