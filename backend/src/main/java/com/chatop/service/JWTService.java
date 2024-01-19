@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -20,11 +19,9 @@ import com.chatop.model.User;
 public class JWTService {
 
     private JwtEncoder jwtEncoder;
-    private JwtDecoder jwtDecoder;
 
-    public JWTService(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder) {
+    public JWTService(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
-        this.jwtDecoder = jwtDecoder;
     }
 
     public Map<String, String> generateToken(User user) {
@@ -40,14 +37,10 @@ public class JWTService {
         JwtEncoderParameters encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims);
         Jwt jwt = this.jwtEncoder.encode(encoderParameters);
         
+        // Création de l'objet contenant le token
         Map<String, String> tokenObject = new HashMap<>();
         tokenObject.put("token", jwt.getTokenValue());
         
         return tokenObject;
-    }
-
-    public String extractUserEmail(String token) {
-        Jwt jwt = jwtDecoder.decode(token);
-        return jwt.getClaims().get("email").toString();
     }
 }

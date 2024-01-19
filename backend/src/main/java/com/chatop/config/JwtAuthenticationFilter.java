@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.chatop.service.JwtService;
+import com.chatop.service.JWTService;
 
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  private final JwtService jwtService;
+  private final JWTService jwtService;
   private final UserDetailsService userDetailsService;
 
   @Override

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,15 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chatop.dto.LoginRequest;
 import com.chatop.dto.RegisterRequest;
+import com.chatop.dto.UserDto;
 import com.chatop.model.User;
 import com.chatop.service.AuthenticationService;
 import com.chatop.service.JWTService;
 import com.chatop.service.UserService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
-
 
 
 @RestController
@@ -31,10 +28,14 @@ public class AuthController {
 
     private JWTService jwtService;
     private UserService userService;
+    private AuthenticationService authService;
+    private ModelMapper modelMapper;
 
-    public AuthController(JWTService jwtService, UserService userService) {
+    public AuthController(JWTService jwtService, UserService userService, AuthenticationService authService, ModelMapper modelMapper) {
         this.jwtService = jwtService;
         this.userService = userService;
+        this.authService = authService;
+        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/login")
@@ -42,13 +43,16 @@ public class AuthController {
         String email = loginDetails.getEmail();
         String password = loginDetails.getPassword();
     
+        // Vérifier si l'utilisateur existe dans la base de données avec le login donné
         User user = userService.getUserByEmail(email);
     
         if (user == null || !userService.checkPassword(user, password)) {
+            // Utilisateur non trouvé ou mot de passe incorrect
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Collections.singletonMap("error", "User not found or incorrect credentials"));
         }
     
+        // Utilisateur trouvé et mot de passe correspondant
         Map<String, String> tokenObject = jwtService.generateToken(user);
         return ResponseEntity.ok(tokenObject);
     }
@@ -59,6 +63,7 @@ public class AuthController {
         String name = registrationDetails.getName();
         String password = registrationDetails.getPassword();
     
+        // Vérifier si l'utilisateur existe déjà avec cet email en utilisant le service
         boolean userExists = userService.isUserExistByEmail(email);
         if (userExists) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -66,8 +71,10 @@ public class AuthController {
         }
     
         try {
+            // Utiliser le service pour créer un nouvel utilisateur
             User newUser = userService.createUser(email, name, password);
     
+            // Générer un token pour le nouvel utilisateur enregistré
             Map<String, String> tokenObject = jwtService.generateToken(newUser);
     
             return ResponseEntity.ok(tokenObject);
@@ -77,15 +84,15 @@ public class AuthController {
         }
     }
 
-    @Operation(security = @SecurityRequirement(name = "BearerAuth"), summary = "Get current user's information")
     @GetMapping("/me")
-    public ResponseEntity<User> getUser(HttpServletRequest request) {
+    public ResponseEntity<UserDto> getLoggedInUserInfo(Authentication authentication) {
 
-        final String authHeader = request.getHeader("Authorization");
-
-        String jwt = authHeader.substring(7);
-        String userEmail = jwtService.extractUserEmail(jwt);
-        return ResponseEntity.ok(userService.getUserByEmail(userEmail));
-
+        User user = authService.getLoggedInUser(authentication);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        UserDto userDTO = modelMapper.map(user, UserDto.class);
+        return ResponseEntity.ok(userDTO);
     }
 }

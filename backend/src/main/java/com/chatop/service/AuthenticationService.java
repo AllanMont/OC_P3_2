@@ -21,7 +21,7 @@ public class AuthenticationService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final JWTService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public Authentication register(RegisterRequest request) {
