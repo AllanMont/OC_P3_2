@@ -29,7 +29,7 @@ public class UserController {
 			@ApiResponse(responseCode = "200", description = "Utilisateur trouvé"),
 			@ApiResponse(responseCode = "404", description = "Utilisateur non trouvé")
 	})
-	public ResponseEntity<Object> getUserById(@PathVariable Long id) {
+	public ResponseEntity<Object> getUserById(@PathVariable Integer id) {
 	    Optional<User> optionalUser = userService.getInfosUserById(id);
 
 	    if (optionalUser.isPresent()) {

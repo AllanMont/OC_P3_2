@@ -1,5 +1,6 @@
 package com.chatop.service;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,12 +38,11 @@ public class AuthenticationService {
 
         userRepository.save(user);
 
-        String jwtToken = jwtService.generateToken(user);
-
+        Map<String, String> jwtToken = jwtService.generateToken(user);
 
         return Authentication
             .builder()
-            .token(jwtToken)
+            .token(jwtToken.get("token"))
             .build();
     }
 
@@ -52,18 +52,23 @@ public class AuthenticationService {
             var user = userRepository.findByEmail(request.getEmail());
             System.out.println("User: ");
             System.out.println(user);
-            String jwtToken = jwtService.generateToken(user);
+            Map<String, String> jwtToken = jwtService.generateToken(user);
 
             return Authentication
                 .builder()
-                .token(jwtToken)
+                .token(jwtToken.get("token"))
                 .build();
+                
         } catch (Exception e) {
             throw new RuntimeException("Invalid email/password supplied");
         }
     }
 
-    public Optional<User> getUserById(Long id) {
+    public User getLoggedInUser(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> getUserById(Integer id) {
         if(!userRepository.findById(id).isPresent()) {
             throw new RuntimeException("User not found");
         }
