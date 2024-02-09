@@ -34,16 +34,11 @@ public class RentalService {
   }
 
   public Rental createRental(Rental Rental) {
-      int newId = rentalRepository.findAll().size() + 1;
-      Rental.setOwner_id(newId);
-
-      Rental savedRental = rentalRepository.save(Rental);
-      return savedRental;
+      return rentalRepository.save(Rental);
   }
 
   public Rental updateRental(Rental Rental) {
-      Rental savedRental = rentalRepository.save(Rental);
-      return savedRental;
+      return rentalRepository.save(Rental);
   }
 
  public String uploadPicture(MultipartFile file) {

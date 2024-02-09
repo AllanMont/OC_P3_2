@@ -23,8 +23,8 @@ public class Rental {
 	  private Double surface;
 	  private String picture;
 	  private String description;
-	  private Integer owner_id;
-	  private LocalDateTime created_at;
-	  private LocalDateTime updated_at;
+	  private Integer ownerId;
+	  private LocalDateTime createdAt;
+	  private LocalDateTime updatedAt;
 	  
 }

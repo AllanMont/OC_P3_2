@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.chatop.dto.UserDto;
 import com.chatop.model.User;
 import com.chatop.service.UserService;
 
@@ -29,12 +30,13 @@ public class UserController {
 			@ApiResponse(responseCode = "200", description = "Utilisateur trouvé"),
 			@ApiResponse(responseCode = "404", description = "Utilisateur non trouvé")
 	})
-	public ResponseEntity<Object> getUserById(@PathVariable Integer id) {
+	public ResponseEntity<UserDto> getUserById(@PathVariable Integer id) {
 	    Optional<User> optionalUser = userService.getInfosUserById(id);
 
 	    if (optionalUser.isPresent()) {
-	        Object foundUser = optionalUser.get();
-	        return ResponseEntity.ok(foundUser);
+	        User foundUser = optionalUser.get();
+			UserDto userDto = new UserDto(foundUser.getId(),foundUser.getName(),foundUser.getEmail(),foundUser.getCreated_at(),foundUser.getUpdated_at());
+	        return ResponseEntity.ok(userDto);
 	    } else {
 	        return ResponseEntity.notFound().build();
 	    }
