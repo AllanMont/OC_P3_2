@@ -4,7 +4,7 @@
 # Installation du projet
 
 **1. Cloner le projet**
-git clone git@github.com:AllanMont/OC_P3.git
+https://github.com/AllanMont/OC_P3_2/tree/main
 
 **2. Se diriger vers le back-end**
 cd backend
